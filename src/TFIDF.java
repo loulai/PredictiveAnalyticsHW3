@@ -108,17 +108,29 @@ public class TFIDF extends Preprocessing {
 	public void printTFIDF() {
 		//column header
 		System.out.printf("%-14s ", ""); //padding for row
+		
+		for(int i = 0; i < columnsMap.size(); i++) {
+			System.out.printf("%-14s ", i);
+		}
+		/*
 		for(String key:columnsMap.keySet()) {
 			System.out.printf("%-14s ", key);
-		}
+		}*/
 		System.out.println();
 		
 		//rows
-		for(int i = 0; i < nRow; i++) {
-			System.out.printf("%-14s ", uniqueTerms.get(i)); //current row (e.g. "the")
-			for(String key:columnsMap.keySet()) { //iterates over all columns for that row
-				System.out.printf("%-14f ", columnsMap.get(key).get(i)); 
+		for(int r = 0; r < nRow; r++) {
+			System.out.printf("%-14s ", uniqueTerms.get(r)); //current row (e.g. "the")
+			
+			for(int c = 0; c < nCol; c++) {
+				System.out.printf("%-14f ", columnsMap.get(String.valueOf(c)).get(r));
 			}
+			
+			/*
+			for(String key:columnsMap.keySet()) { //iterates over all columns for that row
+				System.out.printf("%-14f ", columnsMap.get(key).get(r)); 
+			}*/
+			
 			System.out.println();
 		}
 	}
@@ -141,17 +153,17 @@ public class TFIDF extends Preprocessing {
 		PrintWriter writer = new PrintWriter("tfidfNTN.csv");
 		
 		//column header
-		for(String key:columnsMap.keySet()) {
-			writer.print("," + key);
+		for(int i = 0; i < columnsMap.size(); i++) {
+			writer.print("," + i);
 		}
 		writer.println();
-		
+	
 		//rows
-		for(int i = 0; i < nRow; i++) {
-			writer.print(uniqueTerms.get(i) + ","); //each term
+		for(int r = 0; r < nRow; r++) {
+			writer.print(uniqueTerms.get(r) + ","); //each term
 		
-			for(String key:columnsMap.keySet()) { //iterates over all columns for that row
-				writer.print(columnsMap.get(key).get(i) + ","); //TFIDF score
+			for(int c = 0; c < nCol; c++) { //iterates over all columns for that row
+				writer.print(columnsMap.get(String.valueOf(c)).get(r) + ","); //TFIDF score
 			}
 			writer.println();
 		}
@@ -204,14 +216,15 @@ public class TFIDF extends Preprocessing {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		long startTime = System.nanoTime();
-		TFIDF myTFIDF = new TFIDF(2); //evaluate 24 articles
+		TFIDF myTFIDF = new TFIDF(14); //evaluate 24 articles
 		myTFIDF.addTFIDF();
-		myTFIDF.printTFIDF();
-		//myTFIDF.printToCSV();
+		//myTFIDF.printTFIDF();
+		myTFIDF.printToCSV();
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime); 
-		System.out.println("Duration (seconds): " + (duration/1000000000));
+		System.out.println("Duration (min): " + (duration/1000000000)/60);
 	}
+	
 	public static double getTFIDFVerbose(String word, File file, File[] corpus) throws FileNotFoundException { //same code but with print statements
 		ArrayList<String> targetFile = convertFileToArrayList(file);
 		int tf = getTF(word, targetFile);
@@ -228,4 +241,5 @@ public class TFIDF extends Preprocessing {
 	}
 }
 
-//20 mins for 24 articles
+// 20 mins for 24 articles
+// 3.41 min for 14 articles
