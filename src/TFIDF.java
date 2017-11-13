@@ -74,10 +74,11 @@ public class TFIDF extends Preprocessing {
 	}
 	
 	public TFIDF(int n) throws FileNotFoundException {
-		File[][] fileArray = readFiles();
+		File[][] fileArray = readFiles(); //[a1,a2,a3], [a1,a2]
 		
 		File[] evaluatedArticles = new File[n]; //to evaluate only n articles
 		
+		//flatten fileArray into evaluatedArticles
 		int count = 0;
 		for (int i = 0; i < fileArray.length && count < n; i++) { //outer: c
 			for(int k = 0; k < fileArray[i].length && count < n; k++) {//inner: articles
@@ -90,7 +91,7 @@ public class TFIDF extends Preprocessing {
 		ArrayList<String> terms = toUnique(grandArrayList);
 		Map<String, ArrayList<Double>> columnsMap = new HashMap(); // each doc is a column
 		
-		for(int i = 0;i < evaluatedArticles.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
+		for(int i = 0; i < evaluatedArticles.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
 			ArrayList<Double> tfidf = new ArrayList<>(Collections.nCopies(terms.size(), 0.0)); //initialize all zeros
 			columnsMap.put(String.valueOf(i), tfidf);
 		}	
@@ -123,8 +124,8 @@ public class TFIDF extends Preprocessing {
 	}
 	
 	public TFIDF addTFIDF() throws FileNotFoundException {
-		for(int i = 0; i< nCol; i++) {
-			for(int k=0; k< nRow; k++) {
+		for(int i = 0; i < nCol; i++) {
+			for(int k=0; k < nRow; k++) {
 				String currentWord = uniqueTerms.get(k);
 				ArrayList<String> targetFile = convertFileToArrayList(evaluatedArticles[i]);
 				double tfidf = getTFIDF(currentWord, targetFile, evaluatedArticles);

@@ -3,7 +3,7 @@ import java.io.File;
 public class KSimilarity {
 
 	public static void main(String[] args) {
-		File testArticle = new File("./data/C1/article01.txt");
+		File testArticle = new File("./data/C14/article6.txt");
 		KSimilarity kSim = new KSimilarity(testArticle);
 	}
 	
@@ -23,15 +23,17 @@ public class KSimilarity {
 		fileToInt(file);
 	}
 	
-	public static void fileToInt(File file) {
-		String c = file.getParentFile().getName(); //C1
-		String a = file.getName().replaceAll("[^0-9]",""); //10
-		System.out.println(Integer.valueOf(a));
+	public int fileToInt(File file) {
+		int c = Integer.valueOf(file.getParentFile().getName().replace("C", "")); //C1
+		int a = Integer.valueOf(file.getName().replaceAll("[^0-9]","")); //10
+		int position;
+		int fileInt;
 		
-		int[] articlesPerFolder = {8, 8, 4, 8, 13, 5, 8, 10, 4, 18, 8 ,10, 7, 5, 6};
-		int articleNum = 0;
-		for(int i = 0; i < Integer.valueOf(a);i++) {
-			articleNum = articleNum + articlesPerFolder[i];
-		}
+		int[] aggr = {0, 8, 16, 20, 28, 41, 46, 54, 64, 68, 86, 94 ,104, 111, 116, 122};
+
+		position = aggr[c-1] + a;
+		return position;
+		//System.out.printf("C%d A%d\n", c, a);
+		//System.out.println(position);
 	}
 }
