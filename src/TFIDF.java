@@ -17,10 +17,10 @@ public class TFIDF extends Preprocessing {
 	public File[] evaluatedArticles; //all articles under consideration used TFIDF. Lack C information.
 	public String[] articleNames;
 	
-	public static int getTF(String word, ArrayList<String> doc) throws FileNotFoundException {
+	public static int getTF(String word, ArrayList<String> fileAsList) throws FileNotFoundException {
 		int termFreq = 0;
-		for(int i = 0; i < doc.size(); i++) {
-			if(word.equals(doc.get(i))) {
+		for(int i = 0; i < fileAsList.size(); i++) {
+			if(word.equals(fileAsList.get(i))) {
 				termFreq++;
 			}
 		}
@@ -30,33 +30,31 @@ public class TFIDF extends Preprocessing {
 	public static double getIDF(String word, File[] corpus) throws FileNotFoundException {
 		int docsContainingWord = getNumDocsContaingWord(word, corpus);
 		double idf = 0;
-		if(docsContainingWord == 0) {
+		if(docsContainingWord != 0) {
+			idf = Math.log(corpus.length / docsContainingWord);
+		} else {
+			//this will never happen
 			System.out.printf("OOV: No documents contain word: %s\n", word);
 			idf=-1;
-		} else {
-			idf = Math.log(corpus.length / docsContainingWord);
 		}
 		return idf;
 	}
 	
 	public static int getNumDocsContaingWord(String word, File[] corpus) throws FileNotFoundException {
 		int docsContainingWord = 0;
-
+		
 		for(int i = 0; i < corpus.length; i++) { //search every doc for the target word
 			ArrayList<String> currentDoc = convertFileToArrayList(corpus[i]);
-			for(int k=0; k < currentDoc.size(); k++) { 
-				if(word.equals(currentDoc.get(k))) {
-					docsContainingWord++;
-					break; //found, stop searching
-				}
+			if(currentDoc.contains(word)) {
+				docsContainingWord++;
+				break; //found, stop searching
 			}
 		}
 		return docsContainingWord;
 	}
 	
-	public static double getTFIDF(String word, File file, File[] corpus) throws FileNotFoundException {
-		ArrayList<String> targetFile = convertFileToArrayList(file);
-		int tf = getTF(word, targetFile);
+	public static double getTFIDF(String word, ArrayList<String> fileAsList, File[] corpus) throws FileNotFoundException {
+		int tf = getTF(word, fileAsList);
 		double idf = getIDF(word, corpus);
 		double tfidf = tf * idf;
 		return tfidf;
@@ -67,7 +65,8 @@ public class TFIDF extends Preprocessing {
 		ArrayList<String> grandArrayList = new ArrayList<String>();
 		for(int i = 0; i < corpus.length; i++) {
 			ArrayList<String> doc = convertFileToArrayList(corpus[i]); 
-			for (int k =0; k < doc.size();k++) {
+			//System.out.printf("words in article %d: %d\n", i, doc.size());
+			for (int k = 0; k < doc.size();k++) {
 				grandArrayList.add(doc.get(k));
 			}
 		}
@@ -91,7 +90,7 @@ public class TFIDF extends Preprocessing {
 		ArrayList<String> terms = toUnique(grandArrayList);
 		Map<String, ArrayList<Double>> columnsMap = new HashMap(); // each doc is a column
 		
-		for(int i=0;i < evaluatedArticles.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
+		for(int i = 0;i < evaluatedArticles.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
 			ArrayList<Double> tfidf = new ArrayList<>(Collections.nCopies(terms.size(), 0.0)); //initialize all zeros
 			columnsMap.put(String.valueOf(i), tfidf);
 		}	
@@ -127,7 +126,8 @@ public class TFIDF extends Preprocessing {
 		for(int i = 0; i< nCol; i++) {
 			for(int k=0; k< nRow; k++) {
 				String currentWord = uniqueTerms.get(k);
-				double tfidf = getTFIDF(currentWord, evaluatedArticles[i], evaluatedArticles);
+				ArrayList<String> targetFile = convertFileToArrayList(evaluatedArticles[i]);
+				double tfidf = getTFIDF(currentWord, targetFile, evaluatedArticles);
 				
 				//update
 				columnsMap.get(String.valueOf(i)).set(k,  tfidf);
@@ -187,7 +187,7 @@ public class TFIDF extends Preprocessing {
 			articles[articleIndex] = subfile;
 			count++;
 				}
-				fileArray[cIndex] = articles;
+			fileArray[cIndex] = articles;
 			}
 		}
 		
@@ -202,14 +202,15 @@ public class TFIDF extends Preprocessing {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		TFIDF myTFIDF = new TFIDF(1); //evaluate 5 articles
-		System.out.println("hello");
+		long startTime = System.nanoTime();
+		TFIDF myTFIDF = new TFIDF(2); //evaluate 24 articles
 		myTFIDF.addTFIDF();
 		myTFIDF.printTFIDF();
-		System.out.println("-------------");
-		myTFIDF.printToCSV();
+		//myTFIDF.printToCSV();
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime); 
+		System.out.println("Duration (seconds): " + (duration/1000000000));
 	}
-	
 	public static double getTFIDFVerbose(String word, File file, File[] corpus) throws FileNotFoundException { //same code but with print statements
 		ArrayList<String> targetFile = convertFileToArrayList(file);
 		int tf = getTF(word, targetFile);
@@ -226,3 +227,4 @@ public class TFIDF extends Preprocessing {
 	}
 }
 
+//20 mins for 24 articles

@@ -38,7 +38,6 @@ public class Preprocessing {
 	}
 	
 	public static ArrayList<String> preprocess(String textString) throws FileNotFoundException{
-		ArrayList<String> finalArrayList = new ArrayList<String>();
 		ArrayList<String> textArray = new ArrayList<String>(Arrays.asList(textString.toLowerCase().split("[-!~,.():\"\\s]+"))); // lower case & punctuation 
 		
 		// read stopwords
@@ -54,25 +53,7 @@ public class Preprocessing {
         // remove stopwords 
         textArray.removeAll(stopwordArray);
         
-       
-        /*
-		for(int i = 0; i < textArray.length; i++) {
-			boolean isStopword = false;
-			for(int k = 0; k < stopwordArray.length; k++) { 
-				if((textArray[i] + " ").equals(stopwordArray[k] + " ")) {
-		 			isStopword = true;
-		 			break;
-		 		}
-		 	}
-			if(!isStopword) { //keep non-stopwords 
-				finalArrayList.add(textArray[i]);
-			}
-		 }
-		*/
-        for(int i = 0; i < textArray.size(); i++) {
-        	System.out.println(textArray.get(i));
-        }
-		return finalArrayList;
+		return textArray;
 	}
 	
 	public static ArrayList<String> toUnique(ArrayList<String> evaluatedArticles){
