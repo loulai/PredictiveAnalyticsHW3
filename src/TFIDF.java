@@ -2,12 +2,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Scanner;
 
 public class TFIDF extends Preprocessing {
 	
@@ -15,13 +12,10 @@ public class TFIDF extends Preprocessing {
 	public ArrayList<String> uniqueTerms;
 	public int nRow;
 	public int nCol;
-	public File[] mainCorpus; //what is this is this needed?
+	//public File[] mainCorpus; //what is this is this needed?
 	public File[][] fileArray; //[c1][a1,a2,a3]  [c2][a1,a2]..
 	public File[] evaluatedArticles; //all articles under consideration used TFIDF. Lack C information.
 	public String[] articleNames;
-	
-	
-	//ArrayList<String> initialTextList;
 	
 	public static int getTF(String word, ArrayList<String> doc) throws FileNotFoundException {
 		int termFreq = 0;
@@ -80,23 +74,35 @@ public class TFIDF extends Preprocessing {
 		return grandArrayList;
 	}
 	
-	public TFIDF(File[] corpus) throws FileNotFoundException {
-		ArrayList<String> grandArrayList = mergeDocs(corpus);
+	public TFIDF(int n) throws FileNotFoundException {
+		File[][] fileArray = readFiles();
+		
+		File[] evaluatedArticles = new File[n]; //to evaluate only n articles
+		
+		int count = 0;
+		for (int i = 0; i < fileArray.length && count < n; i++) { //outer: c
+			for(int k = 0; k < fileArray[i].length && count < n; k++) {//inner: articles
+				evaluatedArticles[count] = fileArray[i][k];
+				count++;
+			}
+		}
+		
+		ArrayList<String> grandArrayList = mergeDocs(evaluatedArticles);
 		ArrayList<String> terms = toUnique(grandArrayList);
 		Map<String, ArrayList<Double>> columnsMap = new HashMap(); // each doc is a column
 		
-		for(int i=0;i < corpus.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
+		for(int i=0;i < evaluatedArticles.length; i++) { //create doc1:[0, 0, 0, 0] for each doc
 			ArrayList<Double> tfidf = new ArrayList<>(Collections.nCopies(terms.size(), 0.0)); //initialize all zeros
 			columnsMap.put(String.valueOf(i), tfidf);
-		}
+		}	
 		
 		//setting values
 		uniqueTerms = terms;
 		this.columnsMap = columnsMap;
 		nRow = terms.size();
-		nCol = corpus.length;
-		mainCorpus = corpus;
-
+		nCol = evaluatedArticles.length;
+		this.fileArray = fileArray; //all corpus
+		this.evaluatedArticles = evaluatedArticles; //flieArray is a list of all articles. in the final evaluation, this should equal 122.
 	}
 
 	public void printTFIDF() {
@@ -121,7 +127,7 @@ public class TFIDF extends Preprocessing {
 		for(int i = 0; i< nCol; i++) {
 			for(int k=0; k< nRow; k++) {
 				String currentWord = uniqueTerms.get(k);
-				double tfidf = getTFIDF(currentWord, mainCorpus[i], mainCorpus);
+				double tfidf = getTFIDF(currentWord, evaluatedArticles[i], evaluatedArticles);
 				
 				//update
 				columnsMap.get(String.valueOf(i)).set(k,  tfidf);
@@ -151,74 +157,55 @@ public class TFIDF extends Preprocessing {
 		writer.close();
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException {
-	
+	public static File[][] readFiles(){
 		//reading files
 		File[] corpraNames = new File("./data").listFiles();
 		File[][] fileArray = new File[15][];
-	
+		
 		int count = 0;
 		for(File file:corpraNames) {
 			
 			if(file.isDirectory()) {
 				int numArticles = 0;
 				
-			
-				//System.out.println(file);
-				int cIndex = Integer.valueOf(file.getName().replaceAll("[^0-9]","")) - 1; // C1 -> 0
-				//System.out.println(cIndex);
-				
-				for(File subfile:file.listFiles()) {
-					numArticles++; //counting
-				}
-				
-				//String[] articleNames = new String[15]; //2D array to flatten later
-				File[] articles = new File[numArticles];
-			
-				//System.out.println("num articles " + numArticles);
-				for(File subfile:file.listFiles()) {
-					//System.out.print("\t" + subfile + "\n"); 
-					int articleIndex = Integer.valueOf(subfile.getName().replaceAll("[^0-9]","")) - 1; // Article 2 -> 1
-					//articleNames[articleIndex] = subfile.getName();
-					articles[articleIndex] = subfile;
-					count++;
+		//System.out.println(file);
+		int cIndex = Integer.valueOf(file.getName().replaceAll("[^0-9]","")) - 1; // C1 -> 0
+		//System.out.println(cIndex);
+		
+		for(File subfile:file.listFiles()) {
+			numArticles++; //counting
+		}
+		
+		//String[] articleNames = new String[15]; //2D array to flatten later
+		File[] articles = new File[numArticles];
+		
+		//System.out.println("num articles " + numArticles);
+		for(File subfile:file.listFiles()) {
+			//System.out.print("\t" + subfile + "\n"); 
+			int articleIndex = Integer.valueOf(subfile.getName().replaceAll("[^0-9]","")) - 1; // Article 2 -> 1
+			//articleNames[articleIndex] = subfile.getName();
+			articles[articleIndex] = subfile;
+			count++;
 				}
 				fileArray[cIndex] = articles;
 			}
 		}
-	
 		
-		// proves fileArray is sorted
-		/*for(int i = 0; i < fileArray.length; i++) {
+		/*proves fileArray is sorted
+		for(int i = 0; i < fileArray.length; i++) {
 			for(int k = 0; k < fileArray[i].length; k++) {
 				System.out.println(i + " " + fileArray[i][k]);
 			}
-		}*/
-		
-		//combine corpuses
-		int totalArticles = 0;
-		for (int i = 0; i < fileArray.length; i++) {
-			for(int k = 0; k < fileArray[i].length; k++) {
-				totalArticles++; //122
-			}
 		}
-		
-		totalArticles = 122;
-		File[] evaluatedArticles = new File[totalArticles];
-		
-		int count1 = 0;
-		for (int i = 0; i < fileArray.length; i++) { //outer: c
-			for(int k = 0; k < fileArray[i].length; k++) {//inner: articles
-				evaluatedArticles[count1] = fileArray[i][k];
-				count1++;
-			}
-		}
-		
-		TFIDF myTFIDF = new TFIDF(evaluatedArticles);
-		myTFIDF.fileArray = fileArray; //all corpus
-		myTFIDF.evaluatedArticles = evaluatedArticles; //flieArray is a list of all articles. in the final evaluation, this should equal 122.
+		*/
+		return fileArray;
+	}
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		TFIDF myTFIDF = new TFIDF(1); //evaluate 5 articles
+		System.out.println("hello");
 		myTFIDF.addTFIDF();
-		//myTFIDF.printTFIDF();
+		myTFIDF.printTFIDF();
 		System.out.println("-------------");
 		myTFIDF.printToCSV();
 	}

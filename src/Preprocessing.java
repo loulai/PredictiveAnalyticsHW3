@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -14,40 +17,48 @@ public class Preprocessing {
 		System.out.println(test);
 	}
 	
-	public static ArrayList<String> convertFileToArrayList(File file) throws FileNotFoundException  { //calls preprocessing method
+	public static ArrayList<String> convertFileToArrayList(File file) throws FileNotFoundException  { 
+		// converts one file to an ArrayList
+		// calls preprocessing method
 		String finalString = "";
 		String[] finalArray;
 		ArrayList<String> finalArrayList;
-		Scanner targetInput = null;
-		try { targetInput = new Scanner(file);} catch (FileNotFoundException e) {e.printStackTrace();}
+		
+		try { 
+		Scanner sc = new Scanner(file);
 		
 		//read textfile one line at a time
-		while(targetInput.hasNext()) {
-			finalString += targetInput.next().trim() + " "; 
+		while(sc.hasNext()) {
+			finalString += sc.next().trim() + " "; 
 		}
+		} catch (FileNotFoundException e) {e.printStackTrace();}
+		
 		finalArrayList = preprocess(finalString);
 		return finalArrayList;
 	}
 	
 	public static ArrayList<String> preprocess(String textString) throws FileNotFoundException{
 		ArrayList<String> finalArrayList = new ArrayList<String>();
-		String[] textArray;
+		ArrayList<String> textArray = new ArrayList<String>(Arrays.asList(textString.toLowerCase().split("[-!~,.():\"\\s]+"))); // lower case & punctuation 
 		
-		textArray = textString.toLowerCase().split("[-!~,.():\"\\s]+"); // lower case & punctuation 
-		
-		// stopwords
+		// read stopwords
 		String stopwords = "";
-		String[] stopwordArray;
+		ArrayList<String> stopwordArray;
         File stopwordsFile = new File("./data/stopwords.txt");
         Scanner stopwordsInput = new Scanner(stopwordsFile);
         while(stopwordsInput.hasNext()) {
         	stopwords += stopwordsInput.next().trim() + " ";
         }
-        stopwordArray = stopwords.split(" ");
+        stopwordArray = new ArrayList<String>(Arrays.asList(stopwords.split(" ")));
+       
+        // remove stopwords 
+        textArray.removeAll(stopwordArray);
         
+       
+        /*
 		for(int i = 0; i < textArray.length; i++) {
 			boolean isStopword = false;
-			for(int k = 0; k < stopwordArray.length; k++) { //check is stopword
+			for(int k = 0; k < stopwordArray.length; k++) { 
 				if((textArray[i] + " ").equals(stopwordArray[k] + " ")) {
 		 			isStopword = true;
 		 			break;
@@ -57,13 +68,16 @@ public class Preprocessing {
 				finalArrayList.add(textArray[i]);
 			}
 		 }
-		
+		*/
+        for(int i = 0; i < textArray.size(); i++) {
+        	System.out.println(textArray.get(i));
+        }
 		return finalArrayList;
 	}
 	
-	public static ArrayList<String> toUnique(ArrayList<String> arrayList){
+	public static ArrayList<String> toUnique(ArrayList<String> evaluatedArticles){
 		ArrayList<String> uniqueArrayList;
-		uniqueArrayList = new ArrayList<String>(new LinkedHashSet<String>(arrayList)); //unique tokens 
+		uniqueArrayList = new ArrayList<String>(new LinkedHashSet<String>(evaluatedArticles)); //unique tokens 
 		return uniqueArrayList;
 	}
 
