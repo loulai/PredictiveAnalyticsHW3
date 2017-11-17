@@ -150,7 +150,7 @@ public class TFIDF extends Preprocessing {
 	}
 	
 	public void printToCSV() throws FileNotFoundException {
-		PrintWriter writer = new PrintWriter("tfidfNTN.csv");
+		PrintWriter writer = new PrintWriter("tfidfMatrix.csv");
 		
 		//column header
 		for(int i = 0; i < columnsMap.size(); i++) {
