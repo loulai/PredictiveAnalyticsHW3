@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public abstract class DistanceFunction {
 	
 	public abstract double calculateDistance(ArrayList<Double> vectorA, ArrayList<Double> vectorB);
@@ -27,5 +28,6 @@ public abstract class DistanceFunction {
 		System.out.println("Euclidian distance: " + new DistanceEuclidian().calculateDistance(array1,array2)); // 6.16
 		*/
 	}
+	
 }
 

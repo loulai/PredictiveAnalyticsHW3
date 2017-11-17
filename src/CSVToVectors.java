@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This class takes the TFIDF CSV file as input and generates a 2D ArrayList as output.
+ * The output is then fed into Dataset.java.
+ * @see Dataset.java
+ */
 public class CSVToVectors {
 	
 	public static void main(String[] args) {
@@ -18,22 +23,18 @@ public class CSVToVectors {
 		*/
 	}
 	
-	int numArticles; // number of articles equals vectors 
-	int dimensions;  // dimensions equals the number of terms (e.g. 1499)
+	int numArticles; // Number of articles equals vectors 
+	int dimensions;  // Dimensions equals the number of terms (e.g. 1499)
 	ArrayList<ArrayList<Double>> vectors;
-	
-	/**
-	 *  Empty default constructor
-	 */
+
 	public CSVToVectors(){
 	}
 	
 	/**
-	 * Constructs an object, in case numArticles/dimensions are needed
+	 * 	Generates vectors as 2D ArrayLists
 	 */
 	public CSVToVectors(File file){
-		try {
-			generateVectors(file); } catch (IOException e) { e.printStackTrace();}
+		try { generateVectors(file); } catch (IOException e) {}
 	}
 	
 	
@@ -42,7 +43,7 @@ public class CSVToVectors {
 		// **temp** 14, in testing should be all 122 articles
 		int numArticles = 14;
 
-		// input type is a CSV
+		// Input type is a CSV
 		File csvFile = file;
 		
 		// Initializing buffered reader
@@ -88,10 +89,10 @@ public class CSVToVectors {
 		// Account for counting the header
 		dimensions = rowCounter - 1;
 		
-		//For debugging: prints out articles as vectors
+		// For debugging: prints out articles as vectors
 		/*
-		for(int i = 0; i < numArticles; i++){ //end: should iterate 122 times for 122 articles
-			// get each vector
+		for(int i = 0; i < numArticles; i++){ // End: should iterate 122 times for 122 articles
+			// Get each vector
 			ArrayList<Double> vector = vectors.get(i); 
 			System.out.println("--------------------- Vector/Article " + (i+1) + " ---------------------");
 			System.out.println("Vector size: " + vector.size());
@@ -101,10 +102,6 @@ public class CSVToVectors {
 			}
 		}*/
 		return vectors;
-	}
-	
-	public void tranposeCSV(ArrayList<ArrayList<Double>> vectors) {
-		
 	}
 			
 	}
