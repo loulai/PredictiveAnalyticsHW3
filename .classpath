@@ -8,6 +8,7 @@
 	<classpathentry kind="lib" path="/home/louiselai88gmail/eclipse/java-oxygen/eclipse/javaML/javaml-0.1.7/lib/commons-math-1.2.jar"/>
 	<classpathentry kind="lib" path="/home/louiselai88gmail/eclipse/java-oxygen/eclipse/javaML/javaml-0.1.7/lib/ajt-2.9.jar"/>
 	<classpathentry kind="lib" path="/home/louiselai88gmail/eclipse/java-oxygen/eclipse/javaML/javaml-0.1.7/lib/Jama-1.0.2.jar"/>
-	<classpathentry kind="lib" path="/home/louiselai88gmail/eclipse/java-oxygen/eclipse/javaML/javaml-0.1.7/javaml-0.1.7-src"/>
+	<classpathentry kind="lib" path="/home/louiselai88gmail/eclipse/java-oxygen/eclipse/pca_transform"/>
+	<classpathentry kind="src" path="/pca_transform_long"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

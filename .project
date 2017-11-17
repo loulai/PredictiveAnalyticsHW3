@@ -3,6 +3,7 @@
 	<name>HW3</name>
 	<comment></comment>
 	<projects>
+		<project>pca_transform_long</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
