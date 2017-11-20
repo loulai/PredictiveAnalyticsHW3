@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
+
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.tools.data.FileHandler;
+import net.sf.javaml.clustering.Clusterer;
+import net.sf.javaml.clustering.KMeans;
 import net.sf.javaml.clustering.evaluation.ClusterEvaluation;
 import net.sf.javaml.clustering.evaluation.SumOfSquaredErrors;
 
@@ -26,10 +30,10 @@ import net.sf.javaml.clustering.evaluation.SumOfSquaredErrors;
 public class MyKMeans {
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
-
 		// Initialize the necessary input variables for KMeans()
-		File inputFile = new File("./tfidfMatrix.csv");
-		int k = 2;
+		//File inputFile = new File("./tfidfMatrix.csv");
+		File inputFile = new File("./tfidfMatrixLong.csv");
+		int k = 3;
 		DistanceFunction myDistFunct = DistanceFunction.getDistanceFunctionByName("cosine");
 		
 		// Create new KMeans object 
@@ -40,119 +44,6 @@ public class MyKMeans {
 		
 		// Print statistics
 		myKMeans.printStatistics();
-		
-	
-		/** ------ Comparing to JavaML is still work in progress ------ */
-		/* JavaML comparision Part 1 */
-		// Load dataset in correct input format for JavaML
-		// Dataset data = FileHandler.loadDataset(new File("./iris.data"), 4, ","); // data >> [{[5.1, 3.5, 1.4, 0.2];Iris-setosa}, .. {}]
-		Dataset data = FileHandler.loadDataset(new File("./transposedTFIDF.csv"), ",");
-
-		/*
-		// JavaML
-			// Create a new JavaML KMeans object. When no options specified defaults to generating 4 clusters. 
-			Clusterer km = new KMeans();
-			System.out.println(" >> after KMeans()");
-			//System.out.println(km);
-			System.out.println();
-			
-			// Cluster the data. Returns an array of data sets, with each dataset representing a cluster
-			Dataset[] clusters = km.cluster(data);
-			System.out.println(" >> after clustering");
-			//System.out.println(clusters[0].instance(0));
-			System.out.println();
-		*/
-		/* JavaML comparision Part 2 
-		// MyKMeans
-			// Create new MyKMeans object 
-			MyKMeans myKMeans = new MyKMeans();
-			
-			// Run KMeans 
-			File inputFile = new File("./tfidfMatrix.csv");
-			int k = 4;
-			DistanceFunction myDistFunct = DistanceFunction.getDistanceFunctionByName("cosine");
-			List<Cluster> listOfClusters = myKMeans.runAlgorithm(inputFile, k, myDistFunct);
-			
-			// Initialize a new Dataset array the size of the number of clusters generated
-			Dataset[] myClusters = new Dataset[listOfClusters.size()];
-		
-			for(int i = 0; i < k; i++) { // -> Cluster
-				// Store current cluster's vectors
-				ArrayList<Vector> currentVectors = listOfClusters.get(i).vectors;
-				
-				// Count how many vectors in a cluster
-				int numVectorsInCluster = currentVectors.size();
-		
-				// Dataset = cluster
-				Dataset tempCluster = new DefaultDataset();
-				
-				for(int m = 0; m < numVectorsInCluster; m++) { // -> Vector
-					// Store current loop's vector
-					Vector currentVector = currentVectors.get(m);
-					
-					System.out.printf("cluster: %d vec: %d\n", i+1, m+1);
-				
-					// Convert an ArrayList to an Array
-					double[] values = new double[currentVector.size()];
-					for(int z = 0; z < currentVector.size(); z++) { // -> Numbers
-						values[z] = currentVector.get(z);
-					}
-					tempCluster.add(new DenseInstance(values));// Instance = vector
-				}
-				myClusters[i] = tempCluster;
-			}
-			System.out.println("Number of clusters: " + myClusters.length);
-			System.out.println("Number of vectors in cluster one: " + myClusters[0].size());
-			System.out.println("Dimensions in cluster 1 > vec 1: " + myClusters[0].instance(0).size());
-					
-		// Create a cluster quality measure 
-		ClusterEvaluation sse = new SumOfSquaredErrors();
-		System.out.println(" >> after SSE");
-		//System.out.println(sse);
-		System.out.println();
-		*/
-		/* 
-		// Measure cluster quality 
-		double score = sse.score(clusters);
-		System.out.println(" >> after scoring");
-		System.out.println("score  " + score);
-		System.out.println();
-		*/
-		
-		/*
-		////-------------------------
-		//Dataset data2 = FileHandler.loadDataset(new File("./iris.data"), 4, ",");
-		File irisInput = new File("./iristrans.csv");
-		
-		System.out.println(irisInput);
-		MyKMeans km2 = new MyKMeans();
-		List<Cluster> clustersAsArrayList = km2.runAlgorithm(irisInput, 4, myDistFunct);
-		int[] numVecs = new int[4];
-		int i = 0;
-		for(Cluster cluster:clustersAsArrayList) {
-			numVecs[i] = cluster.getSize();
-			System.out.println(numVecs[i]);
-			i++;
-			System.out.println("what");
-		}
-		//System.out.println(clustersAsArrayList.get(0).getVectors());
-	*/
-		/*
-		Dataset[] cluster2 = 
-		ClusterEvaluation sse2 = new SumOfSquaredErrors();
-		double score2 = sse2.score(clusters2);
-		*/
-		
-		/*// Test: reveals that one vector will always be left unclustered. Todo: figure out why and fix
-		int[] numVecs = new int[k];
-		int i = 0;
-		for(Cluster cluster:listOfClusters) {
-			numVecs[i] = cluster.getSize();
-			System.out.println(numVecs[i]);
-			i++;
-			System.out.println("what");
-		}*/
-		/** ------ End of JavaML comparison ------ */
 	}
 	
 	// The list of clusters generated
@@ -171,6 +62,7 @@ public class MyKMeans {
 	long startTimestamp; // the start time of the latest execution
 	long endTimestamp;   // the end time of the latest execution
 	long iterationCount; // the number of iterations that was performed
+	int numClusters;     // the number of clusters generated (equivalent to k)
 
 	public MyKMeans() { 
 		
@@ -185,6 +77,7 @@ public class MyKMeans {
 		startTimestamp =  System.currentTimeMillis();
 		// reset the number of iterations
 		iterationCount = 0;
+		numClusters = k;
 		
 		this.distf = distf;
 		
@@ -201,8 +94,7 @@ public class MyKMeans {
 		//System.out.println(initialVectors.size());
 		
 		// Get size of vectors
-		int vectorsSize = initialVectors.get(0).getSize(); //1499 for articles 1 to 14
-		System.out.println(vectorsSize);
+		int vectorsSize = initialVectors.get(0).getSize(); //1499 for articles 1 to 14. 2020 for 1 to 20
 		
 		// attributeNames = reader.getAttributeNames();
 		
@@ -221,7 +113,6 @@ public class MyKMeans {
 		return clusters;
 	}
 
-	
 	/**
 	 * ----------------- ApplyKMeans -----------------
 	 */
@@ -230,7 +121,7 @@ public class MyKMeans {
 		// Initialize empty list of clusters
 		ArrayList<Cluster> newClusters = new ArrayList<Cluster>();
 		
-		int recomputingCount = 0;
+		//int recomputingCount = 0;
 		
 		// (1) Randomly generate k empty clusters with a random cluster center
 		for(int i = 0; i < k; i++){
@@ -251,7 +142,6 @@ public class MyKMeans {
 			changed = false;
 			
 			//  (2) Assign each point to the nearest centriod
-
 			for (Vector vector : vectors) {
 				Cluster nearestCluster = null;
 				Cluster containingCluster = null;
@@ -293,8 +183,8 @@ public class MyKMeans {
 			// (3) Recompute new centriods
 			for (Cluster cluster : newClusters) {
 				cluster.recomputeClusterMean();
-				System.out.println("recomputing #" + recomputingCount);
-				recomputingCount++;
+				//System.out.println("recomputing #" + recomputingCount);
+				//recomputingCount++;
 			}
 			// (4) Repeat steps (2) and (3) until no there is no more point reassignment
 		}
@@ -312,6 +202,8 @@ public class MyKMeans {
 			Double randomDouble = minValue + (maxValue - minValue) * random.nextDouble() ;
 			randomVector.setValue(i, randomDouble);
 		}
+		// Displays vaues of generated centroids
+		// System.out.println(randomVector.values);
 		return randomVector;
 	}
 	
@@ -319,24 +211,110 @@ public class MyKMeans {
 	 * ----------------- PrintStats -----------------
 	 */
 	public void printStatistics() {
+		int sum = 0;
+		System.out.println("\n=========== MyKMeans.java Statistics ===========");
+		System.out.println(" Total time       : " + (endTimestamp - startTimestamp) + " ms");
+		System.out.println(" Total iterations : " + iterationCount);
+		System.out.println("--------------------------------------------------");
+
 		for(int i = 0; i < clusters.size(); i++) {
-			System.out.printf("Cluster %d: \n", i+1);
+			System.out.printf("Cluster %d: (%d)\n", i+1, clusters.get(i).getSize());
 			if(clusters.get(i) != null) {
 				Cluster currentCluster = clusters.get(i);
 				for(int k = 0; k < currentCluster.getSize(); k++) {
-					//System.out.println(k+1);
-					System.out.printf("\t %3d. %s %s\n", k, currentCluster.vectors.get(k).getArticleName(), currentCluster.vectors.get(k));
-					//System.out.println("\t Vec " + k + ": " + currentCluster.vectors.get(k));
+					System.out.printf("\t %s: %s\n", currentCluster.vectors.get(k).getArticleName(), currentCluster.vectors.get(k));
 				}
 			}
+			System.out.println();;
+			sum += clusters.get(i).getSize();
 		}
-		System.out.println("\n------------ MyKMeans.java Evaluation ------------ ");
-		System.out.println(" Total time       : " + (endTimestamp - startTimestamp) + " ms");
-		System.out.println(" Total iterations : " + iterationCount);
-		System.out.println(" JavaML comparison: *work in progress*");
-		System.out.println("--------------------------------------------------\n");
+		System.out.printf("Total articles: (%d)\n", sum);
+		System.out.println("\n-------------- JavaML Comparison  --------------\n");
+		this.javaMLComparison();
+		System.out.println("==================================================\n");
+	}
+	
+	/**
+	 * ----------------- JavaML Comparison -----------------
+	 * Steps to compare my K-means algorithm performance are:
+	 * (1) Cluster articles using my own K-Means algorithm
+	 * (2) Cluster articles using the K-Means algorithm by JavaML
+	 * (3) Compare results using sum-of-squared-errors (SSE)
+	 */
+	public void javaMLComparison() {
+		double myScore = 0;
+		
+		try {
+		// Load dataset in correct input format for JavaML
+		// Dataset data = FileHandler.loadDataset(new File("./iris.data"), 4, ","); // data >> [{[5.1, 3.5, 1.4, 0.2];Iris-setosa}, .. {}]
+		Dataset data;
+		//data = FileHandler.loadDataset(new File("./smallTransposedTFIDF.csv"), ",");
+		data = FileHandler.loadDataset(new File("./transposedTFIDFLong.csv"), ",");
+		
+		// (1) MyKMeans
+			// Set up input values
+			File inputFile = new File("./tfidfMatrixLong.csv");
+			DistanceFunction myDistFunct = DistanceFunction.getDistanceFunctionByName("cosine");
+			
+			// Run KMeans
+			List<Cluster> listOfClusters = clusters;
+			
+			// Format MyKMeans clustering output for evaluation
+			// (1) Initialize a new Dataset array the size of the number of clusters generated
+			Dataset[] myClusters = new Dataset[listOfClusters.size()];
+		
+			// (2) Fill Dataset with clustered vectors
+			for(int i = 0; i < numClusters; i++) { // -> Cluster
+				// Store current cluster's vectors
+				ArrayList<Vector> currentVectors = listOfClusters.get(i).vectors;
+				
+				// Count how many vectors in a cluster
+				int numVectorsInCluster = currentVectors.size();
+		
+				// Dataset is a cluster; Dataset[] are clusters
+				Dataset tempCluster = new DefaultDataset();
+				
+				for(int m = 0; m < numVectorsInCluster; m++) { // -> Vector
+					// Store current loop's vector
+					Vector currentVector = currentVectors.get(m);
+				
+					// Copy an ArrayList to Array
+					double[] values = new double[currentVector.getSize()];
+					for(int z = 0; z < currentVector.getSize(); z++) { // -> Numbers
+						values[z] = currentVector.getValue(z);
+					}
+					tempCluster.add(new DenseInstance(values));// Instance = vector
+				}
+				myClusters[i] = tempCluster;
+			}
+		
+		// (2) JavaML
+			// Create a new JavaML KMeans object 
+			Clusterer km = new KMeans(numClusters, (int) iterationCount);
+			
+			// Cluster the data. Returns an array of data sets, with each dataset representing a cluster
+			System.out.println(">> JavaML clustering running");
+			Dataset[] javaMLClusters = km.cluster(data);
+			System.out.println("== JavaML clustering complete\n");
+			
+		// Evaluate JavaML and myKMeans clustering results based on Sum of Squared Errors (SSE)
+		// Create two cluster quality measures
+		ClusterEvaluation javaMLSSE = new SumOfSquaredErrors();
+		ClusterEvaluation mySSE = new SumOfSquaredErrors();
+		
+		// MyKMeans SSE
+		myScore  = mySSE.score(myClusters);
+		System.out.printf("MyKMeans score: %.2f\n", myScore);
+		
+		// JavaML SSE
+		double javaMLScore = javaMLSSE.score(javaMLClusters);
+		System.out.printf("JavaML score  : %.2f\n", javaMLScore);
+		
+		System.out.printf("Difference    :  %.2f\n", myScore - javaMLScore);
+		} catch (IOException e) {e.printStackTrace();}
 	}
 }
+
 
 /**
  *  Notes:

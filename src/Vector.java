@@ -48,7 +48,7 @@ public class Vector {
 				break;
 			}
 		}
-		return String.format("c%d A%d", c,a);
+		return String.format("c%d article%d", c,a);
 	}
 
 	public void setValue(int i, Double number) {

@@ -16,7 +16,7 @@ public class CSVToVectors {
 	public static void main(String[] args) {
 		
 		try {
-			File inputFile = new File("./tfidfMatrix.csv");
+			File inputFile = new File("./tfidfMatrixLong.csv");
 			CSVToVectors testReader = new CSVToVectors();
 			ArrayList<Vector> testVectors = testReader.generateVectors(inputFile);
 		} catch (IOException e) { e.printStackTrace();}
@@ -42,7 +42,7 @@ public class CSVToVectors {
 	public ArrayList<Vector> generateVectors(File file) throws IOException {
 		
 		// **temp** 14, in testing should be all 122 articles
-		int numArticles = 14;
+		int numArticles = 20;
 
 		// Input type is a CSV
 		File csvFile = file;
@@ -72,8 +72,8 @@ public class CSVToVectors {
 			
 			if(rowCounter == 1) {
 				//initializing *14* vectors
-				for(int i = 0; i < numArticles; i++) {
-					Vector newVector = new Vector(1499); // ****** temp ***** change 1499 to the total number of terms == dimensions of each vector
+				for(int i = 0; i < numArticles; i++) {   // 2020 dimensions for 20 articles
+					Vector newVector = new Vector(2020); // ****** temp ***** change 1499 to the total number of terms == dimensions of each vector
 					newVector.setArticleProperties(i+1); // needs plus 1 because naming begins from 1, not 0
 					vectors.add(newVector);
 				}

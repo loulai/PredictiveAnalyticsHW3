@@ -21,17 +21,14 @@ public class DistanceCosine extends DistanceFunction {
 	        normA += Math.pow(vectorA.getValue(i), 2);
 	        normB += Math.pow(vectorB.getValue(i), 2);
 	    }   
-	    
 	   
 	    return (1 - dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));
-	    
 	    
 	}
 	
 	public static void main(String[] args) {
 		
 		// Calculate the Cosine distance between vectors
-		
 		
 		// Initialize two non-identical vectors
 		ArrayList<Double> arrayList1 = new ArrayList<Double>(Arrays.asList(3.0, 2.0, 0.0, 5.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0));
@@ -50,6 +47,8 @@ public class DistanceCosine extends DistanceFunction {
 		System.out.println(new DistanceCosine().calculateDistance(array3,array4));
 		// NaN
 	}
+	
+	
 	
 	
 	

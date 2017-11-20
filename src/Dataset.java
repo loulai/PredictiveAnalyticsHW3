@@ -20,9 +20,10 @@ public class Dataset {
 	double[][] arrays;
 	int numRows;
 	int numColumns;
+	ArrayList<Vector> vectors;
 	
 	public static void main(String[] args) {
-		File inputFile = new File("./tfidfMatrix.csv");
+		File inputFile = new File("./tfidfMatrixLong.csv");
 		CSVToVectors tfidfVectors = new CSVToVectors(inputFile);
 		Dataset tfidfDataset = new Dataset(tfidfVectors);	
 		
@@ -35,7 +36,7 @@ public class Dataset {
 		dataset2.printMatrix();
 		
 		// Run only if new TFIDF matrix created and want to generate transposed CSV file. Very quick.
-		//tfidfDataset.printToCSV("transposedTFIDF.csv");
+		//tfidfDataset.printToCSV("transposedTFIDFLong.csv");
 	}
 
 	public Dataset(Matrix inputMatrix) {
@@ -47,6 +48,7 @@ public class Dataset {
 	
 	public Dataset(CSVToVectors CSVToVecObject) {
 		ArrayList<Vector> ArrayListVectors = CSVToVecObject.vectors;
+		vectors = ArrayListVectors;
 		numRows = ArrayListVectors.size();      // rows = 14
 		numColumns = CSVToVecObject.dimensions; // cols = 1499
 		
@@ -123,7 +125,7 @@ public class Dataset {
 	public void printMatrix() {
 		
 		// Print basic statistics
-		System.out.printf("\n%d-by-%d Dataset\n", numRows, numColumns);
+		System.out.printf("%d-by-%d Dataset\n", numRows, numColumns);
 		System.out.printf("%d values \n\n", numRows * numColumns);
 		
 		// Print column numbers
@@ -132,7 +134,7 @@ public class Dataset {
 			// Print column number
 			System.out.printf("%7d ", k+1);
 		}
-		System.out.print("\n    ________________________________________________________________________\n");
+		System.out.print("\n    ________________________________________________________________________ ___ ___  ___   __   __   __   __   __    _    _    _\n");
 		
 		for(int i = 0; i < numRows; i++) {
 			// Print row number

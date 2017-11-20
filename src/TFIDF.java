@@ -150,7 +150,7 @@ public class TFIDF extends Preprocessing {
 	}
 	
 	public void printToCSV() throws FileNotFoundException {
-		PrintWriter writer = new PrintWriter("tfidfMatrix.csv");
+		PrintWriter writer = new PrintWriter("tfidfMatrixLong.csv");
 		
 		//column header
 		for(int i = 0; i < columnsMap.size(); i++) {
@@ -216,10 +216,12 @@ public class TFIDF extends Preprocessing {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		long startTime = System.nanoTime();
-		TFIDF myTFIDF = new TFIDF(14); //evaluate 24 articles
+		System.out.println("start");
+		TFIDF myTFIDF = new TFIDF(20); //evaluate 24 articles
 		myTFIDF.addTFIDF();
 		//myTFIDF.printTFIDF();
 		myTFIDF.printToCSV();
+		System.out.println("end");
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime); 
 		System.out.println("Duration (min): " + (duration/1000000000)/60);
@@ -241,5 +243,5 @@ public class TFIDF extends Preprocessing {
 	}
 }
 
-// 20 mins for 24 articles
 // 3.41 min for 14 articles
+// 11 min for 20 articles
