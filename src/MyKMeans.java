@@ -27,7 +27,6 @@ public class MyKMeans {
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 
-		/*
 		// Initialize the necessary input variables for KMeans()
 		File inputFile = new File("./tfidfMatrix.csv");
 		int k = 2;
@@ -41,10 +40,10 @@ public class MyKMeans {
 		
 		// Print statistics
 		myKMeans.printStatistics();
-		*/
+		
 	
-		/////////// >>>>>>>>>> Comparing to JavaML
-
+		/** ------ Comparing to JavaML is still work in progress ------ */
+		/* JavaML comparision Part 1 */
 		// Load dataset in correct input format for JavaML
 		// Dataset data = FileHandler.loadDataset(new File("./iris.data"), 4, ","); // data >> [{[5.1, 3.5, 1.4, 0.2];Iris-setosa}, .. {}]
 		Dataset data = FileHandler.loadDataset(new File("./transposedTFIDF.csv"), ",");
@@ -63,6 +62,7 @@ public class MyKMeans {
 			//System.out.println(clusters[0].instance(0));
 			System.out.println();
 		*/
+		/* JavaML comparision Part 2 
 		// MyKMeans
 			// Create new MyKMeans object 
 			MyKMeans myKMeans = new MyKMeans();
@@ -110,8 +110,8 @@ public class MyKMeans {
 		System.out.println(" >> after SSE");
 		//System.out.println(sse);
 		System.out.println();
-		
-		/*
+		*/
+		/* 
 		// Measure cluster quality 
 		double score = sse.score(clusters);
 		System.out.println(" >> after scoring");
@@ -152,7 +152,7 @@ public class MyKMeans {
 			i++;
 			System.out.println("what");
 		}*/
-		
+		/** ------ End of JavaML comparison ------ */
 	}
 	
 	// The list of clusters generated
@@ -167,7 +167,7 @@ public class MyKMeans {
 	// The names of the attributes
 	List<String> attributeNames = null;
 	
-	// For statistics
+	// For evaluation
 	long startTimestamp; // the start time of the latest execution
 	long endTimestamp;   // the end time of the latest execution
 	long iterationCount; // the number of iterations that was performed
@@ -248,19 +248,18 @@ public class MyKMeans {
 		while(true) {
 			iterationCount++;
 			changed = false;
+			
 			//  (2) Assign each point to the nearest centriod
 
-			// / for each vector
 			for (ArrayList<Double> vector : vectors) {
-				// find the nearest cluster and the cluster containing the item
 				Cluster nearestCluster = null;
 				Cluster containingCluster = null;
 				double distanceToNearestCluster = Double.MAX_VALUE;
 				
-				// for each cluster
+				// for vector, consider each cluster and do the following:
 				for (Cluster cluster : newClusters) {
 					
-					// calculate the distance of the cluster mean to the vector
+					// calculate the distance of the centriod to the vector
 					double distance = distf.calculateDistance(cluster.mean, vector);
 					
 					// if it is the smallest distance until now, record this cluster and the distance
@@ -275,19 +274,18 @@ public class MyKMeans {
 					}
 				}
 
-				// if the nearest cluster is not the cluster containing the vector
+				// Update the vector to the nearest cluster
 				if (containingCluster != nearestCluster) {
-					// remove the vector from the containing cluster
 					if (containingCluster != null) {
 						containingCluster.removeVector(vector);
 					}
-					// add the vector to the nearest cluster
 					nearestCluster.addVector(vector);
 					changed = true;
 				}
 			}
 
-			if(!changed){ // exit condition for main loop
+			// Break if there was no cluster reassignment
+			if(!changed){ 
 				break;
 			}
 			
@@ -320,10 +318,21 @@ public class MyKMeans {
 	 * ----------------- PrintStats -----------------
 	 */
 	public void printStatistics() {
-		System.out.println("=========== KMEANS - STATISTICSS ===========");
-		System.out.println(" Total time     : " + (endTimestamp - startTimestamp) + " ms");
-		System.out.println(" Iteration count: " + iterationCount);
-		System.out.println("============================================\n");
+		for(int i = 0; i < clusters.size(); i++) {
+			System.out.printf("Cluster %d: \n", i+1);
+			if(clusters.get(i) != null) {
+				Cluster currentCluster = clusters.get(i);
+				for(int k = 0; k < currentCluster.getSize(); k++) {
+					//System.out.println(k+1);
+					System.out.println("\t Vec " + k + ": " + currentCluster.vectors.get(k));
+				}
+			}
+		}
+		System.out.println("\n------------ MyKMeans.java Evaluation ------------ ");
+		System.out.println(" Total time       : " + (endTimestamp - startTimestamp) + " ms");
+		System.out.println(" Total iterations : " + iterationCount);
+		System.out.println(" JavaML comparison: *work in progress*");
+		System.out.println("--------------------------------------------------\n");
 	}
 }
 

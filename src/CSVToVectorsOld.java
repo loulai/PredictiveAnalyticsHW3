@@ -18,15 +18,14 @@ public class CSVToVectors {
 		try {
 			File inputFile = new File("./tfidfMatrix.csv");
 			CSVToVectors testReader = new CSVToVectors();
-			ArrayList<Vector> testVectors = testReader.generateVectors(inputFile);
+			ArrayList<ArrayList<Double>> testVectors = testReader.generateVectors(inputFile);
 		} catch (IOException e) { e.printStackTrace();}
 		
 	}
 	
 	int numArticles; // Number of articles equals vectors 
 	int dimensions;  // Dimensions equals the number of terms (e.g. 1499)
-	//ArrayList<Vector> vectors;
-	ArrayList<Vector> vectors;
+	ArrayList<ArrayList<Double>> vectors;
 
 	public CSVToVectors(){
 	}
@@ -39,7 +38,7 @@ public class CSVToVectors {
 	}
 	
 	
-	public ArrayList<Vector> generateVectors(File file) throws IOException {
+	public ArrayList<ArrayList<Double>> generateVectors(File file) throws IOException {
 		
 		// **temp** 14, in testing should be all 122 articles
 		int numArticles = 14;
@@ -51,8 +50,8 @@ public class CSVToVectors {
 		BufferedReader br = new BufferedReader(new FileReader(csvFile));
 		
 		// Each vector is an arrayList<Double>
-		// The return value is an arrayList of vectors, hence ArrayList<Vector>
-		vectors = new ArrayList<Vector>(numArticles);
+		// The return value is an arrayList of vectors, hence ArrayList<ArrayList<Double>>
+		vectors = new ArrayList<ArrayList<Double>>(numArticles);
 		
 		// Each line is one row being read by bufferedReader
 		String line; 
@@ -64,55 +63,46 @@ public class CSVToVectors {
 		// Initial rowCounter begins at 1 (not 0) to omit the header row we just read
 		int rowCounter = 1;
 		
-		// Loops through each term (i.e. each word, which is also each dimension)
 		while ((line = br.readLine()) != null) {
 			String[] oneLine = line.split(",");
 			
 			int numColumns = oneLine.length; //15 (14 articles, 1 term column) ** temp **
 			
 			if(rowCounter == 1) {
-				//initializing *14* vectors
+				//initializing *14* vectors (ArrayLists<Double>)
 				for(int i = 0; i < numArticles; i++) {
-					Vector newVector = new Vector(1499); // ****** temp ***** change 1499 to the total number of terms == dimensions of each vector
-					newVector.setArticleProperties(i+1); // needs plus 1 because naming begins from 1, not 0
-					vectors.add(newVector);
+					System.out.println(headerLine[i+1]);
+					List<Double> newVector = new ArrayList<Double>(Collections.nCopies(1499, 0.0));
+					vectors.add((ArrayList<Double>) newVector);
 				}
 			}
 			
-			// Loop through each article, assign value
+			// Loop through each column, assign value
 			// Begins at 1 to omit term column
 			for (int c = 1; c < numArticles + 1; c++) { 
-				Double value = Double.parseDouble(oneLine[c]);
-				Vector currentVector = vectors.get(c-1);
-				currentVector.setValue(rowCounter-1, value);
-				//System.out.println("currentVector " + currentVector.articleName);
-				//System.out.println(currentVector.values);
+				Double number = Double.parseDouble(oneLine[c]);
+				vectors.get(c-1).set(rowCounter-1, number);
 			}
 			
 			// At the end, this number is the total number of rows in the tfidf matrix
 			rowCounter++; 
-			
-			//Vector currentVector = vectors.get(2);
-			//System.out.println(currentVector.articleName + ": " + currentVector.values );
 	    }
 		
 		// Account for counting the header
 		dimensions = rowCounter - 1;
 		
 		// For debugging: prints out articles as vectors
-		
+		/*
 		for(int i = 0; i < numArticles; i++){ // End: should iterate 122 times for 122 articles
 			// Get each vector
-			Vector vector = vectors.get(i); //not gonna be get i
-			System.out.println("--------------------- Vector or Article " + (i+1) + " ---------------------");
-			System.out.println("Article Name: " + vector.getArticleName());
-			System.out.println("Dimensions  : " + vector.getSize());
-			
-			// print the first 5 TFIDF values. To print all, change to: for(int k = 0; k < vector.getSize(); k++) {
-			for(int k = 0; k < 5; k++) {
-				System.out.printf("Vec #%2d  Row #%4d  TFIDF: %f\n", i+1, k+1, vector.getValue(k));
+			ArrayList<Double> vector = vectors.get(i); 
+			System.out.println("--------------------- Vector/Article " + (i+1) + " ---------------------");
+			System.out.println("Vector size: " + vector.size());
+			//System.out.println("[vector/article] row. TFIDF");
+			for(int k = 0; k < vector.size(); k++) {
+				System.out.printf("Vec #%2d  Row #%4d  TFIDF: %f\n", i+1, k+1, vector.get(k));
 			}
-		}
+		}*/
 		return vectors;
 	}
 			
