@@ -3,6 +3,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Vector {
 
@@ -19,8 +20,15 @@ public class Vector {
 		
 	}
 	
+	public Vector() {
+		values = new ArrayList<Double>();
+	}
 	public Vector(int size) {
 		values = new ArrayList<Double>(Collections.nCopies(size, 0.0));
+	}
+	
+	public Vector(ArrayList<Double> al) {
+		values = al;
 	}
 	
 	public Vector(int num, ArrayList<Double> al) {
@@ -28,7 +36,7 @@ public class Vector {
 		articleNumber = num;
 		articleName = intToFilename(num);
 	}
-	
+
 	public static String intToFilename(int num) {
 		int[] aggr = {0, 8, 16, 20, 28, 41, 46, 54, 64, 68, 86, 94 ,104, 111, 116, 122};
 		int c=0;
@@ -40,7 +48,7 @@ public class Vector {
 				break;
 			}
 		}
-		return String.format("c%d, article%d", c,a);
+		return String.format("c%d A%d", c,a);
 	}
 
 	public void setValue(int i, Double number) {
@@ -56,11 +64,19 @@ public class Vector {
 		return values.size();
 	}
 
-	public Object getValue(int i) {
+	public double getValue(int i) {
 		return values.get(i);
 	}
 
 	public String getArticleName() {
 		return articleName;
+	}
+
+	public boolean isEmpty() {
+		return values.isEmpty();
+	}
+
+	public void addAll(Vector vector) {
+		this.addAll(vector);
 	}
 }

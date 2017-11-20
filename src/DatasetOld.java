@@ -46,16 +46,16 @@ public class Dataset {
 	}
 	
 	public Dataset(CSVToVectors CSVToVecObject) {
-		ArrayList<Vector> ArrayListVectors = CSVToVecObject.vectors;
+		ArrayList<ArrayList<Double>> ArrayListVectors = CSVToVecObject.vectors;
 		numRows = ArrayListVectors.size();      // rows = 14
 		numColumns = CSVToVecObject.dimensions; // cols = 1499
 		
-		// Convert 2D ArrayList to Vector
+		// Convert 2D ArrayList to 2D Array
 		double[][] ArrayVectors = new double[numRows][numColumns];
 		for(int i = 0; i < numRows; i++) {
-			Vector currentRow = ArrayListVectors.get(i);
+			ArrayList<Double> oneRow = ArrayListVectors.get(i);
 			for(int k = 0; k < numColumns; k++) {
-				ArrayVectors[i][k] = currentRow.getValue(k);
+				ArrayVectors[i][k] = oneRow.get(k);
 			}
 		}
 		matrix = new Matrix(ArrayVectors);

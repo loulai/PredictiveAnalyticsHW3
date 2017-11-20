@@ -78,7 +78,7 @@ public class MyKMeans {
 		
 			for(int i = 0; i < k; i++) { // -> Cluster
 				// Store current cluster's vectors
-				ArrayList<ArrayList<Double>> currentVectors = listOfClusters.get(i).vectors;
+				ArrayList<Vector> currentVectors = listOfClusters.get(i).vectors;
 				
 				// Count how many vectors in a cluster
 				int numVectorsInCluster = currentVectors.size();
@@ -88,7 +88,7 @@ public class MyKMeans {
 				
 				for(int m = 0; m < numVectorsInCluster; m++) { // -> Vector
 					// Store current loop's vector
-					ArrayList<Double> currentVector = currentVectors.get(m);
+					Vector currentVector = currentVectors.get(m);
 					
 					System.out.printf("cluster: %d vec: %d\n", i+1, m+1);
 				
@@ -189,7 +189,7 @@ public class MyKMeans {
 		this.distf = distf;
 		
 		// Structure to store the vectors from the file
-		ArrayList<ArrayList<Double>> initialVectors;
+		ArrayList<Vector> initialVectors;
 		
 		// Variables to store the minimum and maximum values in vectors
 		double maxValue = 0;
@@ -201,14 +201,15 @@ public class MyKMeans {
 		//System.out.println(initialVectors.size());
 		
 		// Get size of vectors
-		int vectorsSize = initialVectors.get(0).size(); //1499 for articles 1 to 14
+		int vectorsSize = initialVectors.get(0).getSize(); //1499 for articles 1 to 14
+		System.out.println(vectorsSize);
 		
 		// attributeNames = reader.getAttributeNames();
 		
 		// Get min and max for each vector from the initial vectors
-		for(ArrayList<Double> vector : initialVectors){
-			minValue = Collections.min(vector);
-			maxValue = Collections.max(vector);
+		for(Vector vector : initialVectors){
+			minValue = Collections.min(vector.values);
+			maxValue = Collections.max(vector.values);
 		}
 		
 		clusters = applyKMeans(k, distf, initialVectors, minValue, maxValue, vectorsSize);
@@ -224,7 +225,7 @@ public class MyKMeans {
 	/**
 	 * ----------------- ApplyKMeans -----------------
 	 */
-	ArrayList<Cluster> applyKMeans(int k, DistanceFunction distf, ArrayList<ArrayList<Double>> vectors, double minValue, double maxValue, int vectorsSize) {
+	ArrayList<Cluster> applyKMeans(int k, DistanceFunction distf, ArrayList<Vector> vectors, double minValue, double maxValue, int vectorsSize) {
 		
 		// Initialize empty list of clusters
 		ArrayList<Cluster> newClusters = new ArrayList<Cluster>();
@@ -251,7 +252,7 @@ public class MyKMeans {
 			
 			//  (2) Assign each point to the nearest centriod
 
-			for (ArrayList<Double> vector : vectors) {
+			for (Vector vector : vectors) {
 				Cluster nearestCluster = null;
 				Cluster containingCluster = null;
 				double distanceToNearestCluster = Double.MAX_VALUE;
@@ -303,13 +304,13 @@ public class MyKMeans {
 	/**
 	 * ----------------- RandomVector -----------------
 	 */
-	ArrayList<Double> generateRandomVector(double minValue, double maxValue, int vectorsSize) {
-		ArrayList<Double> randomVector = new ArrayList<Double>(vectorsSize);
+	Vector generateRandomVector(double minValue, double maxValue, int vectorsSize) {
+		Vector randomVector = new Vector(vectorsSize);
 		
 		// Generate a random double for each position
 		for(int i = 0; i < vectorsSize; i++){
 			Double randomDouble = minValue + (maxValue - minValue) * random.nextDouble() ;
-			randomVector.add(randomDouble);
+			randomVector.setValue(i, randomDouble);
 		}
 		return randomVector;
 	}
@@ -324,7 +325,8 @@ public class MyKMeans {
 				Cluster currentCluster = clusters.get(i);
 				for(int k = 0; k < currentCluster.getSize(); k++) {
 					//System.out.println(k+1);
-					System.out.println("\t Vec " + k + ": " + currentCluster.vectors.get(k));
+					System.out.printf("\t %3d. %s %s\n", k, currentCluster.vectors.get(k).getArticleName(), currentCluster.vectors.get(k));
+					//System.out.println("\t Vec " + k + ": " + currentCluster.vectors.get(k));
 				}
 			}
 		}

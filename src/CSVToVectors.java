@@ -100,7 +100,7 @@ public class CSVToVectors {
 		dimensions = rowCounter - 1;
 		
 		// For debugging: prints out articles as vectors
-		
+		/*
 		for(int i = 0; i < numArticles; i++){ // End: should iterate 122 times for 122 articles
 			// Get each vector
 			Vector vector = vectors.get(i); //not gonna be get i
@@ -113,6 +113,7 @@ public class CSVToVectors {
 				System.out.printf("Vec #%2d  Row #%4d  TFIDF: %f\n", i+1, k+1, vector.getValue(k));
 			}
 		}
+		*/
 		return vectors;
 	}
 			
